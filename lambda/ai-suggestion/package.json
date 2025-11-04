@@ -1,0 +1,24 @@
+{
+  "name": "ai-suggestion-lambda",
+  "version": "1.0.0",
+  "description": "AI suggestion Lambda function for Smart Cooking MVP",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.400.0",
+    "@aws-sdk/client-dynamodb": "^3.400.0",
+    "@aws-sdk/lib-dynamodb": "^3.400.0",
+    "@smithy/types": "^4.6.0",
+    "@smithy/util-middleware": "^4.2.0",
+    "aws-xray-sdk-core": "^3.10.3",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.0",
+    "@types/node": "^20.0.0",
+    "@types/uuid": "^10.0.0",
+    "typescript": "^5.0.0"
+  }
+}

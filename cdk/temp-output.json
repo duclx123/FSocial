@@ -1,0 +1,22 @@
+{
+  "SmartCooking-dev-Modular": {
+    "CloudFrontDistributionIdBFB1951A": "E2R1RR8H6I118Z",
+    "ApiGatewayName": "smart-cooking-api-dev",
+    "CloudFrontDistributionId": "E2R1RR8H6I118Z",
+    "DatabaseTableArn3F8FD890": "arn:aws:dynamodb:us-east-1:706703046236:table/smart-cooking-data-dev",
+    "CloudFrontDistributionDomainNameFAAF3EEF": "d1gbqkqasmkxw0.cloudfront.net",
+    "CloudFrontCDNDomainNameE0EB8805": "d1gbqkqasmkxw0.cloudfront.net",
+    "MonitoringScheduleRuleName": "smart-cooking-monitoring-schedule-dev",
+    "CDNDomainName": "d1gbqkqasmkxw0.cloudfront.net",
+    "ApiEndpoint4F160690": "https://16zzu55s46.execute-api.us-east-1.amazonaws.com/dev/",
+    "AuthUserPoolIdC0605E59": "us-east-1_ra3KwfSmc",
+    "ApiGatewayUrl": "https://16zzu55s46.execute-api.us-east-1.amazonaws.com/dev/",
+    "DatabaseTableName64177828": "smart-cooking-data-dev",
+    "MonitoringScheduleRuleArn": "arn:aws:events:us-east-1:706703046236:rule/smart-cooking-monitoring-schedule-dev",
+    "ExportsOutputRefDatabaseSmartCookingTableA87C46C7A0D9DD18": "smart-cooking-data-dev",
+    "ApiGatewayId": "16zzu55s46",
+    "AuthUserPoolClientId8216BF9A": "50me6jgm9b89dvl1vlu1dmgf4i",
+    "ExportsOutputFnGetAttDatabaseSmartCookingTableA87C46C7Arn1FDA8D87": "arn:aws:dynamodb:us-east-1:706703046236:table/smart-cooking-data-dev",
+    "ExportsOutputFnGetAttDatabaseSmartCookingTableA87C46C7StreamArn87437FF5": "arn:aws:dynamodb:us-east-1:706703046236:table/smart-cooking-data-dev/stream/2025-10-31T16:26:21.970"
+  }
+}

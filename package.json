@@ -1,0 +1,60 @@
+{
+  "name": "smart-cooking-mvp",
+  "version": "1.0.0",
+  "description": "Smart Cooking MVP - AI-powered recipe suggestion app",
+  "main": "index.js",
+  "scripts": {
+    "build:lambda": "cd lambda && npm run build",
+    "deploy:cdk": "cd cdk && npm run deploy",
+    "deploy:dev": "cd cdk && npm run deploy:dev",
+    "deploy:prod": "cd cdk && npm run deploy:prod",
+    "deploy:infra:dev": "./scripts/deploy-infrastructure.sh -e dev",
+    "deploy:infra:prod": "./scripts/deploy-infrastructure.sh -e prod",
+    "deploy:frontend:dev": "./scripts/deploy-frontend.sh -e dev",
+    "deploy:frontend:prod": "./scripts/deploy-frontend.sh -e prod",
+    "deploy:full:dev": "npm run deploy:infra:dev && npm run deploy:frontend:dev",
+    "deploy:full:prod": "npm run deploy:infra:prod && npm run deploy:frontend:prod",
+    "seed:ingredients": "npx ts-node scripts/seed-master-ingredients.ts",
+    "test:ingredient-search": "npx ts-node scripts/test-ingredient-search.ts",
+    "test:seeding-data": "npx ts-node scripts/test-seeding-data.ts",
+    "setup": "npm install && cd cdk && npm install && cd ../lambda && npm install",
+    "test:lambda": "cd lambda && npm test",
+    "test:lambda:coverage": "cd lambda && npm run test:coverage",
+    "test:frontend": "cd frontend && npm test",
+    "test:frontend:coverage": "cd frontend && npm run test:coverage",
+    "test:integration": "cd frontend && TEST_ENV=aws npm test -- --testPathPattern=integration",
+    "test:e2e": "cd frontend && TEST_ENV=aws npm test -- --testPathPattern=e2e",
+    "test:coverage": "npm run test:lambda:coverage && npm run test:frontend:coverage",
+    "test:all": "npm run test:lambda && npm run test:frontend",
+    "test:all:coverage": "npm run test:lambda:coverage && npm run test:frontend:coverage",
+    "test:coverage:report": "start lambda/coverage/lcov-report/index.html && start frontend/coverage/lcov-report/index.html"
+  },
+  "keywords": [
+    "aws",
+    "serverless",
+    "ai",
+    "cooking",
+    "recipes",
+    "lambda",
+    "dynamodb"
+  ],
+  "author": "Smart Cooking Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.400.0",
+    "@aws-sdk/client-cloudwatch": "^3.400.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.400.0",
+    "@aws-sdk/client-dynamodb": "^3.400.0",
+    "@aws-sdk/client-s3": "^3.400.0",
+    "@aws-sdk/client-sns": "^3.901.0",
+    "@aws-sdk/lib-dynamodb": "^3.400.0",
+    "@types/uuid": "^10.0.0",
+    "aws-xray-sdk-core": "^3.10.3",
+    "uuid": "^13.0.0"
+  }
+}

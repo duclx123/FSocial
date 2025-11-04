@@ -1,0 +1,24 @@
+{
+  "PK": {"S": "USER#e4d844a8-80b1-706b-f38c-f64da2ddc92c"},
+  "SK": {"S": "PREFERENCES"},
+  "entity_type": {"S": "USER_PREFERENCES"},
+  "user_id": {"S": "e4d844a8-80b1-706b-f38c-f64da2ddc92c"},
+  "dietary_restrictions": {"L": []},
+  "allergies": {"L": []},
+  "favorite_cuisines": {"L": []},
+  "preferred_cooking_methods": {"L": []},
+  "notification_settings": {"M": {
+    "email_notifications": {"BOOL": true},
+    "push_notifications": {"BOOL": true},
+    "friend_requests": {"BOOL": true},
+    "comments": {"BOOL": true},
+    "likes": {"BOOL": true}
+  }},
+  "privacy_settings": {"M": {
+    "profile_visibility": {"S": "public"},
+    "post_default_visibility": {"S": "public"},
+    "show_email": {"BOOL": false}
+  }},
+  "created_at": {"S": "2025-10-17T01:30:12.8805619+07:00"},
+  "updated_at": {"S": "2025-10-17T01:30:12.8805619+07:00"}
+}

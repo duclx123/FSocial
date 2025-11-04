@@ -1,0 +1,71 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        npm install
+        cd src && npm install
+        cd ../lambda && npm install
+    
+    - name: Run Express unit tests
+      run: |
+        cd src
+        npm test
+      continue-on-error: true
+    
+    - name: Run Lambda unit tests
+      run: |
+        cd tests/unit
+        npm install
+        npm test
+      continue-on-error: true
+    
+    - name: Build TypeScript
+      run: |
+        cd src && npm run build
+        cd ../lambda/auth-handler && npm run build
+    
+    - name: Security scan
+      run: |
+        npm audit --audit-level=high
+      continue-on-error: true
+
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Run ESLint
+      run: npm run lint
+      continue-on-error: true

@@ -1,0 +1,11 @@
+# Ignore compiled JavaScript files
+*.js
+*.d.ts
+*.js.map
+
+# Keep test files
+!*.test.ts
+!*.test.js
+
+# Keep TypeScript source
+!*.ts

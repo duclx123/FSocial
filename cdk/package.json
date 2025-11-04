@@ -1,0 +1,37 @@
+{
+  "name": "smart-cooking-cdk",
+  "version": "1.0.0",
+  "description": "AWS CDK infrastructure for Smart Cooking MVP",
+  "main": "lib/main-stack.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk",
+    "deploy": "cdk deploy SmartCooking-dev",
+    "deploy:dev": "cdk deploy SmartCooking-dev --context environment=dev",
+    "deploy:prod": "cdk deploy SmartCooking-prod --context environment=prod",
+    "diff": "cdk diff",
+    "synth": "cdk synth",
+    "destroy": "cdk destroy SmartCooking-dev",
+    "destroy:prod": "cdk destroy SmartCooking-prod --context environment=prod"
+  },
+  "devDependencies": {
+    "@types/node": "20.6.3",
+    "dotenv": "^17.2.3",
+    "typescript": "~5.2.2"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.123.0",
+    "constructs": "^10.1.308",
+    "esbuild": "^0.25.10"
+  },
+  "keywords": [
+    "aws",
+    "cdk",
+    "smart-cooking",
+    "serverless",
+    "typescript"
+  ],
+  "author": "Smart Cooking Team",
+  "license": "MIT"
+}

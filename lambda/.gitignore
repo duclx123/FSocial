@@ -1,0 +1,38 @@
+# Compiled output
+*.js
+*.js.map
+*.d.ts
+*.d.ts.map
+!jest.config.js
+
+# Build directories
+dist/
+build/
+
+# Dependencies
+node_modules/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+
+# Temporary
+*.tmp
+.cache/

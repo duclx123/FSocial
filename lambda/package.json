@@ -1,0 +1,42 @@
+{
+  "name": "lambda-shared",
+  "version": "1.0.0",
+  "description": "Shared dependencies for Smart Cooking Lambda functions",
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.400.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.400.0",
+    "@aws-sdk/client-dynamodb": "^3.400.0",
+    "@aws-sdk/client-s3": "^3.400.0",
+    "@aws-sdk/lib-dynamodb": "^3.400.0",
+    "@aws-sdk/s3-request-presigner": "^3.400.0",
+    "@aws-sdk/util-dynamodb": "^3.400.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20.0.0",
+    "@types/sinon": "^17.0.4",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "aws-sdk-client-mock": "^4.1.0",
+    "aws-sdk-client-mock-jest": "^4.1.0",
+    "eslint": "^8.57.1",
+    "eslint-plugin-jest": "^27.9.0",
+    "jest": "^30.2.0",
+    "sinon": "^21.0.0",
+    "ts-jest": "^29.4.5",
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage --passWithNoTests",
+    "test:unit": "jest --testPathPattern=unit --passWithNoTests",
+    "lint": "eslint . --ext .ts",
+    "lint:test": "eslint . --ext .ts --config .eslintrc.test.js",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "test:lint": "npm run lint:test"
+  }
+}

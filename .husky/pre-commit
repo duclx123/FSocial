@@ -1,0 +1,64 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🧪 Running test quality checks..."
+
+# Check if we're in Lambda directory and run Lambda-specific checks
+if [ -d "lambda" ]; then
+  echo "📦 Checking Lambda tests..."
+  cd lambda
+  
+  # Run test linting
+  npm run lint:test
+  if [ $? -ne 0 ]; then
+    echo "❌ Lambda test linting failed"
+    exit 1
+  fi
+  
+  # Run tests to ensure they pass
+  npm run test
+  if [ $? -ne 0 ]; then
+    echo "❌ Lambda tests failed"
+    exit 1
+  fi
+  
+  # Check coverage thresholds
+  npm run test:coverage
+  if [ $? -ne 0 ]; then
+    echo "❌ Lambda coverage thresholds not met"
+    exit 1
+  fi
+  
+  cd ..
+fi
+
+# Check if we're in Frontend directory and run Frontend-specific checks
+if [ -d "frontend" ]; then
+  echo "🎨 Checking Frontend tests..."
+  cd frontend
+  
+  # Run test linting
+  npm run lint:test
+  if [ $? -ne 0 ]; then
+    echo "❌ Frontend test linting failed"
+    exit 1
+  fi
+  
+  # Run tests to ensure they pass
+  npm run test
+  if [ $? -ne 0 ]; then
+    echo "❌ Frontend tests failed"
+    exit 1
+  fi
+  
+  # Check coverage thresholds
+  npm run test:coverage
+  if [ $? -ne 0 ]; then
+    echo "❌ Frontend coverage thresholds not met"
+    exit 1
+  fi
+  
+  cd ..
+fi
+
+echo "✅ All test quality checks passed!"

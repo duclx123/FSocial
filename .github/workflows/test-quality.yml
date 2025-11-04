@@ -1,0 +1,303 @@
+name: Test Quality Enforcement
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'lambda/**'
+      - 'frontend/**'
+      - '**/*.test.ts'
+      - '**/*.test.tsx'
+      - '**/*.spec.ts'
+      - '**/*.spec.tsx'
+  push:
+    branches: [ main, develop ]
+
+jobs:
+  lambda-test-quality:
+    name: Lambda Test Quality
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.modified, 'lambda/') || contains(github.event.pull_request.changed_files, 'lambda/')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: lambda/package-lock.json
+
+      - name: Install Lambda dependencies
+        run: |
+          cd lambda
+          npm ci
+
+      - name: Run Lambda test linting
+        run: |
+          cd lambda
+          npm run lint:test
+
+      - name: Run Lambda tests
+        run: |
+          cd lambda
+          npm run test
+
+      - name: Run Lambda coverage check
+        run: |
+          cd lambda
+          npm run test:coverage
+
+      - name: Upload Lambda coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          file: lambda/coverage/lcov.info
+          flags: lambda
+          name: lambda-coverage
+
+      - name: Comment coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'lambda/coverage/coverage-summary.json';
+            
+            if (fs.existsSync(path)) {
+              const coverage = JSON.parse(fs.readFileSync(path, 'utf8'));
+              const { statements, branches, functions, lines } = coverage.total;
+              
+              const coverageComment = `
+              ## 📊 Lambda Test Coverage Report
+              
+              | Metric | Coverage | Threshold | Status |
+              |--------|----------|-----------|--------|
+              | Statements | ${statements.pct}% | 80% | ${statements.pct >= 80 ? '✅' : '❌'} |
+              | Branches | ${branches.pct}% | 80% | ${branches.pct >= 80 ? '✅' : '❌'} |
+              | Functions | ${functions.pct}% | 80% | ${functions.pct >= 80 ? '✅' : '❌'} |
+              | Lines | ${lines.pct}% | 80% | ${lines.pct >= 80 ? '✅' : '❌'} |
+              
+              ${statements.pct >= 80 && branches.pct >= 80 && functions.pct >= 80 && lines.pct >= 80 
+                ? '🎉 All coverage thresholds met!' 
+                : '⚠️ Some coverage thresholds not met. Please add more tests.'}
+              `;
+              
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: coverageComment
+              });
+            }
+
+  frontend-test-quality:
+    name: Frontend Test Quality
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.modified, 'frontend/') || contains(github.event.pull_request.changed_files, 'frontend/')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Run Frontend test linting
+        run: |
+          cd frontend
+          npm run lint:test
+
+      - name: Run Frontend tests
+        run: |
+          cd frontend
+          npm run test
+
+      - name: Run Frontend coverage check
+        run: |
+          cd frontend
+          npm run test:coverage
+
+      - name: Upload Frontend coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          file: frontend/coverage/lcov.info
+          flags: frontend
+          name: frontend-coverage
+
+      - name: Comment coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'frontend/coverage/coverage-summary.json';
+            
+            if (fs.existsSync(path)) {
+              const coverage = JSON.parse(fs.readFileSync(path, 'utf8'));
+              const { statements, branches, functions, lines } = coverage.total;
+              
+              const coverageComment = `
+              ## 🎨 Frontend Test Coverage Report
+              
+              | Metric | Coverage | Threshold | Status |
+              |--------|----------|-----------|--------|
+              | Statements | ${statements.pct}% | 70% | ${statements.pct >= 70 ? '✅' : '❌'} |
+              | Branches | ${branches.pct}% | 70% | ${branches.pct >= 70 ? '✅' : '❌'} |
+              | Functions | ${functions.pct}% | 70% | ${functions.pct >= 70 ? '✅' : '❌'} |
+              | Lines | ${lines.pct}% | 70% | ${lines.pct >= 70 ? '✅' : '❌'} |
+              
+              ${statements.pct >= 70 && branches.pct >= 70 && functions.pct >= 70 && lines.pct >= 70 
+                ? '🎉 All coverage thresholds met!' 
+                : '⚠️ Some coverage thresholds not met. Please add more tests.'}
+              `;
+              
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: coverageComment
+              });
+            }
+
+  test-quality-gate:
+    name: Test Quality Gate
+    runs-on: ubuntu-latest
+    needs: [lambda-test-quality, frontend-test-quality]
+    if: always()
+    
+    steps:
+      - name: Check test quality results
+        run: |
+          if [[ "${{ needs.lambda-test-quality.result }}" == "failure" || "${{ needs.frontend-test-quality.result }}" == "failure" ]]; then
+            echo "❌ Test quality checks failed"
+            exit 1
+          else
+            echo "✅ All test quality checks passed"
+          fi
+
+  test-performance-check:
+    name: Test Performance Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          if [ -d "lambda" ]; then
+            cd lambda && npm ci && cd ..
+          fi
+          if [ -d "frontend" ]; then
+            cd frontend && npm ci && cd ..
+          fi
+
+      - name: Run Lambda performance tests
+        if: contains(github.event.head_commit.modified, 'lambda/') || contains(github.event.pull_request.changed_files, 'lambda/')
+        run: |
+          cd lambda
+          timeout 60s npm test || {
+            echo "❌ Lambda tests took longer than 60 seconds"
+            exit 1
+          }
+          echo "✅ Lambda tests completed within time limit"
+
+      - name: Run Frontend performance tests
+        if: contains(github.event.head_commit.modified, 'frontend/') || contains(github.event.pull_request.changed_files, 'frontend/')
+        run: |
+          cd frontend
+          timeout 80s npm test || {
+            echo "❌ Frontend tests took longer than 80 seconds"
+            exit 1
+          }
+          echo "✅ Frontend tests completed within time limit"
+
+  test-security-scan:
+    name: Test Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Scan for hardcoded secrets in tests
+        run: |
+          # Check for potential secrets in test files
+          if grep -r -E "(password|secret|key|token).*=.*['\"][^'\"]{8,}" --include="*.test.ts" --include="*.test.tsx" --include="*.spec.ts" --include="*.spec.tsx" .; then
+            echo "❌ Potential hardcoded secrets found in test files"
+            exit 1
+          fi
+          echo "✅ No hardcoded secrets found in test files"
+
+      - name: Check for sensitive data in test fixtures
+        run: |
+          # Check for real email addresses, phone numbers, etc.
+          if grep -r -E "([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})" --include="*.test.ts" --include="*.test.tsx" --exclude="*template*" . | grep -v "test@example.com" | grep -v "user@test.com"; then
+            echo "❌ Real email addresses found in test files"
+            exit 1
+          fi
+          echo "✅ No real email addresses found in test files"
+
+  test-documentation-check:
+    name: Test Documentation Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for test documentation
+        run: |
+          # Ensure test files have proper documentation
+          missing_docs=0
+          
+          for file in $(find . -name "*.test.ts" -o -name "*.test.tsx" -o -name "*.spec.ts" -o -name "*.spec.tsx" | grep -v node_modules | grep -v templates); do
+            if ! grep -q "describe\|it\|test" "$file"; then
+              echo "❌ $file appears to be missing test structure"
+              missing_docs=$((missing_docs + 1))
+            fi
+          done
+          
+          if [ $missing_docs -gt 0 ]; then
+            echo "❌ $missing_docs test files are missing proper structure"
+            exit 1
+          fi
+          
+          echo "✅ All test files have proper structure"
+
+      - name: Validate test naming conventions
+        run: |
+          # Check for proper test naming
+          bad_names=0
+          
+          for file in $(find . -name "*.test.ts" -o -name "*.test.tsx" -o -name "*.spec.ts" -o -name "*.spec.tsx" | grep -v node_modules | grep -v templates); do
+            if grep -E "(should work|test|correct|proper)" "$file" > /dev/null; then
+              echo "❌ $file contains vague test names"
+              bad_names=$((bad_names + 1))
+            fi
+          done
+          
+          if [ $bad_names -gt 0 ]; then
+            echo "❌ $bad_names test files have vague test names"
+            echo "Please use descriptive test names that explain the scenario and expected outcome"
+            exit 1
+          fi
+          
+          echo "✅ All test files use descriptive naming"

@@ -1,0 +1,17 @@
+{
+  "PK": {"S": "USER#e4d844a8-80b1-706b-f38c-f64da2ddc92c"},
+  "SK": {"S": "PROFILE"},
+  "entity_type": {"S": "USER_PROFILE"},
+  "user_id": {"S": "e4d844a8-80b1-706b-f38c-f64da2ddc92c"},
+  "username": {"S": "truongops1"},
+  "email": {"S": "nvtruongops1@gmail.com"},
+  "full_name": {"S": "Nguyen Van Truong 1"},
+  "bio": {"S": ""},
+  "avatar_url": {"S": ""},
+  "created_at": {"S": "2025-10-17T01:30:12.1016731+07:00"},
+  "updated_at": {"S": "2025-10-17T01:30:12.1016731+07:00"},
+  "follower_count": {"N": "0"},
+  "following_count": {"N": "0"},
+  "post_count": {"N": "0"},
+  "recipe_count": {"N": "0"}
+}
