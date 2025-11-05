@@ -91,6 +91,28 @@ class AuthService {
     });
   }
 
+  // Resend confirmation code
+  async resendConfirmationCode(email: string): Promise<void> {
+    if (!userPool) {
+      throw new Error('Cognito UserPool not configured');
+    }
+
+    const cognitoUser = new CognitoUser({
+      Username: email,
+      Pool: userPool,
+    });
+
+    return new Promise((resolve, reject) => {
+      cognitoUser.resendConfirmationCode((err, _result) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve();
+      });
+    });
+  }
+
   // Sign in user
   async signIn({ email, password }: SignInParams): Promise<CognitoUserSession> {
     if (!userPool) {

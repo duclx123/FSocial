@@ -1,13 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface RegisterFormProps {
   onSwitchToLogin: () => void;
+  onRegistrationSuccess?: (email: string) => void;
 }
 
-export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
+export default function RegisterForm({ onSwitchToLogin, onRegistrationSuccess }: RegisterFormProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -51,28 +53,82 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
     setLoading(true);
     try {
       await signUp(email, password, name);
-      // Don't redirect - AuthContext will trigger re-render automatically
+      // Call callback to show verification form
+      if (onRegistrationSuccess) {
+        onRegistrationSuccess(email);
+      } else {
+        alert('Registration successful! Please check your email for verification code.');
+        onSwitchToLogin();
+      }
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to register';
-      setError(errorMessage);
+      console.error('Registration error:', err);
+      
+      // Handle specific Cognito errors
+      if (err instanceof Error) {
+        const errorMessage = err.message || err.toString();
+        
+        // User already exists
+        if (errorMessage.includes('User already exists') || 
+            errorMessage.includes('UsernameExistsException') ||
+            errorMessage.includes('An account with the given email already exists')) {
+          setError('This email is already registered. Please login or use a different email.');
+        }
+        // Invalid password format
+        else if (errorMessage.includes('Password did not conform') || 
+                 errorMessage.includes('InvalidPasswordException')) {
+          setError('Password must be at least 8 characters with uppercase, lowercase, and numbers.');
+        }
+        // Invalid email
+        else if (errorMessage.includes('Invalid email') || 
+                 errorMessage.includes('InvalidParameterException')) {
+          setError('Please enter a valid email address.');
+        }
+        // Generic error
+        else {
+          setError(errorMessage || 'Failed to register. Please try again.');
+        }
+      } else {
+        setError('Failed to register. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-extrabold text-gray-800 text-center">Create Account</h2>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="space-y-6"
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.1, duration: 0.5 }}
+      >
+        <h2 className="text-2xl font-extrabold text-center bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
+          Create Account
+        </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           It&apos;s quick and easy.
         </p>
-      </div>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      </motion.div>
+      <motion.form 
+        onSubmit={handleSubmit} 
+        className="space-y-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+      >
         {error && (
-          <div className="rounded-xl bg-red-50/80 backdrop-blur-sm p-4 border border-red-200">
+          <motion.div 
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="rounded-xl bg-red-50/80 backdrop-blur-sm p-4 border border-red-200"
+          >
             <p className="text-sm text-red-700">{error}</p>
-          </div>
+          </motion.div>
         )}
         <div className="relative group">
           <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -159,12 +215,12 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
           <button
             type="button"
             onClick={onSwitchToLogin}
-            className="text-sm text-amber-600 hover:text-amber-700 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 after:bg-amber-600 after:transition-all after:duration-300 hover:after:w-full"
+            className="text-sm text-green-600 hover:text-green-700 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 after:bg-green-600 after:transition-all after:duration-300 hover:after:w-full"
           >
             Already have an account? Log in
           </button>
         </div>
-      </form>
-    </div>
+      </motion.form>
+    </motion.div>
   );
 }
